@@ -7,9 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NetInfra.Web.Models;
-using NetInfra.Web.Models.ManageViewModels;
+using NetInfra.Web.ViewModels;
+using NetInfra.Web.ViewModels.ManageViewModels;
 using NetInfra.Web.Services;
+using NetInfra.Domain;
 
 namespace NetInfra.Web.Controllers
 {

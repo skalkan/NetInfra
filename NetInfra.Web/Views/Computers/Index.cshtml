@@ -1,0 +1,36 @@
+﻿@model NetInfra.ViewModels.AssetsViewModel
+@{
+  ViewData["Title"] = "Index";
+}
+
+<h2>@Model.Person.Ad  @Model.Person.Soyad</h2>
+
+<h1>Computers List</h1>
+<a asp-controller="Computers" asp-action="New" class="btn btn-primary">New Computer</a>
+
+@if (@Model.Computers.Count == 0)
+{
+  <p>Bu arkadaşın hiç bir cihazı yok.</p>
+}
+else
+{
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>STN</th>
+        <th>Seri No</th>
+        <th>Ağ Tipi</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var computer in Model.Computers)
+      {
+        <tr>
+          <td><a asp-controller="Computers" asp-action="Edit" asp-route-id="@computer.Id">@computer.Stn</a></td>
+          <td>@computer.Serino</td>
+          <td>@computer.AgTip.Ad</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

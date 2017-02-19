@@ -1,0 +1,31 @@
+﻿@model NetInfra.ViewModels.ComputerFormViewModel
+@{
+  ViewData["Title"] = "Computer Form";
+}
+
+<h2>Computer Form</h2>
+
+<form asp-action="Save" method="post" class="form-horizontal">
+  <div asp-validation-summary="All"></div>
+  <div class="form-group">
+    <label asp-for="Computer.Stn" class="col-md-2 control-label"></label>
+    <input asp-for="Computer.Stn" class="form-control" />
+  </div>
+  <div class="form-group">
+    <label asp-for="Computer.Serino" class="col-md-2 control-label"></label>
+    <input asp-for="Computer.Serino" class="form-control" />
+  </div>
+  <div class="form-group">
+    <label asp-for="Computer.AgTipId" class="col-md-2 control-label"></label>
+    <select asp-for="Computer.AgTipId"
+            class="form-control"
+            asp-items="@(new SelectList(@Model.AgTips, "Id", "Ad"))"></></select>
+  </div>
+  @Html.HiddenFor(m => m.Computer.Id)
+  @*<input asp-for="Computer.Id" type="hidden" name="computerId" value="@Model.Computer.Id" />*@
+  <div class="form-group">
+    <div class="col-md-offset-2">
+      <input type="submit" class="btn btn-primary" value="Kaydet" />
+    </div>
+  </div>
+</form>
