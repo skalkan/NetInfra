@@ -4,7 +4,7 @@ namespace NetInfra.Domain
 {
   public class AgTip 
   {
-    public byte Id { get; set; }
+    public int Id { get; set; }
 
     [Required]
     [StringLength(50)]

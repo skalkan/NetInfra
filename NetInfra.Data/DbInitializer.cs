@@ -32,9 +32,9 @@ namespace NetInfra.Data
       {
         var agTips = new AgTip[]
         {
-          new AgTip { Id = 1, Ad = "Kara Ağı" },
-          new AgTip { Id = 2, Ad = "İnternet" },
-          new AgTip { Id = 3, Ad = "Yerel Ağ" },
+          new AgTip { Ad = "Kara Ağı" },
+          new AgTip { Ad = "İnternet" },
+          new AgTip { Ad = "Yerel Ağ" },
         };
         foreach (AgTip a in agTips)
         {

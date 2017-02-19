@@ -125,7 +125,7 @@ namespace NetInfra.Data.Migrations
 
             modelBuilder.Entity("NetInfra.Domain.AgTip", b =>
                 {
-                    b.Property<byte>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Ad")
@@ -194,6 +194,8 @@ namespace NetInfra.Data.Migrations
 
                     b.Property<byte?>("AgTipId");
 
+                    b.Property<int?>("AgTipId1");
+
                     b.Property<string>("Serino")
                         .IsRequired()
                         .HasMaxLength(50);
@@ -204,7 +206,7 @@ namespace NetInfra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AgTipId");
+                    b.HasIndex("AgTipId1");
 
                     b.ToTable("Computers");
                 });
@@ -268,7 +270,7 @@ namespace NetInfra.Data.Migrations
                 {
                     b.HasOne("NetInfra.Domain.AgTip", "AgTip")
                         .WithMany()
-                        .HasForeignKey("AgTipId");
+                        .HasForeignKey("AgTipId1");
                 });
         }
     }
