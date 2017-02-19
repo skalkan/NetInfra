@@ -1,0 +1,180 @@
+﻿@model IEnumerable<ComputerMapViewModel>
+@using Microsoft.AspNetCore.Html
+
+@{
+  ViewBag.Title = "Map";
+}
+
+<div class="col-lg-8 b-r">
+  <div class="col-lg-1">
+    <h5 style="margin-top:7px">City</h5>
+  </div>
+  <div class="col-lg-5">
+    <input id="city" type="search" name="city" class="form-control" style="width:100%" />
+  </div>
+  <div class="col-lg-1">
+    <h5 style="margin-top:7px">Store</h5>
+  </div>
+  <div class="col-lg-5">
+    <input id="store" type="search" name="store" class="form-control" style="width:100%" />
+  </div>
+</div>
+<div class="col-lg-2">
+  <input id="btnDisplay" type="submit" value="Filter" class="btn btn-flex btn-block" />
+</div>
+<div class="col-lg-2">
+  <input id="btnCancel" type="submit" value="Cancel" class="btn btn-white btn-block" />
+</div>
+
+<div id="mapid" style="width: 100%; height: 400px">
+</div>
+
+@section Scripts {
+  <script src="~/lib/jquery/dist/jquery.js"></script>
+  <script src="~/lib/leaflet/dist/leaflet.js"></script>
+  <link href="~/lib/leaflet/dist/leaflet.css" rel="stylesheet" />
+  <link href="~/lib/PruneCluster/dist/LeafletStyleSheet.css" rel="stylesheet" />
+  <script src="~/lib/PruneCluster/dist/PruneCluster.js"></script>
+
+  <style>
+  </style>
+
+  <script>
+    $(document).ready(function () {
+      //var data = @@Json.Serialize(Model); //JSON.parse('@@Html.Raw(Json.Encode(Model))');
+      //refreshMarkers(data);
+
+      initMap();
+
+      $('#btnDisplay').click(function () {
+        event.preventDefault();
+        $.ajax({
+          type: 'GET',
+          dataType: 'json',
+          data: {
+            'store': $('#store').val(),
+            'city': $('#city').val()
+          },
+          contentType: 'application/json',
+          url: '@Url.Action("Map2", "Computers")',
+                    success: function (data) {
+                        //test(data);
+                        refreshMarkers(data);
+                    }
+                });
+            });//end $('#btnDisplay').click(function () {
+
+      $('#btnCancel').click(function () {
+                event.preventDefault();
+                //clear textbox values
+                $('#store').val('');
+                $('#city').val('');
+
+                $.ajax({
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        'store': $('#store').val(),
+                        'city': $('#city').val()
+                    },
+                    contentType: 'application/json',
+                    url: '@Url.Action("Map2", "Computers")',
+                    success: function (data) {
+                        test(data);
+                        refreshMarkers(data);
+                    }
+                });
+            });//end $('#btnDisplay').click(function () {
+
+    });//end $(document).ready(function () {
+
+    var map;
+    var streetMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 17,
+      detectRetina: true,
+      attribution: '&copy; OpenStreetMap contributors'
+    });
+    var imageMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/' + 'rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      //minZoom: 10,
+      maxZoom: 17,
+      detectRetina: true,
+      attribution: 'Tiles © Esri — '
+      + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, '
+      + 'Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+    var topoMap = L.tileLayer('http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      maxZoom: 17,
+      detectRetina: true,
+      attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    });
+    var baseMaps = {
+      "StreetMap": streetMap,
+      "ImageMap": imageMap,
+      "TopoMap": topoMap
+    };
+
+    //PRUNE-CLUSTER
+    var pruneCluster = new PruneClusterForLeaflet();
+    pruneCluster.Cluster.Size = 10;
+    pruneCluster.zoomToBoundsOnClick = false;
+
+    var overlayMaps = {
+      "Stores": pruneCluster
+    };
+
+    function initMap() {
+      map = L.map('mapid', {
+        center: [37, 34], //TODO: center verilerin orta noktası olmalı, bounds?
+        zoom: 5,
+        layers: [streetMap, pruneCluster]
+      });
+
+      L.control.layers(baseMaps, overlayMaps, { position: "bottomleft" }).addTo(map);
+
+      //L.control.coordinates({
+      //  position: "bottomright", //optional default "bootomright"
+      //  decimals: 2, //optional default 4
+      //  decimalSeperator: ".", //optional default "."
+      //  labelTemplateLat: "Lat: {y}", //optional default "Lat: {y}"
+      //  labelTemplateLng: "Lon: {x}", //optional default "Lng: {x}"
+      //  enableUserInput: false, //optional default true
+      //  useDMS: false, //optional default false
+      //  useLatLngOrder: true, //ordering of labels, default false-> lng-lat
+      //  markerType: L.marker, //optional default L.marker
+      //  markerProps: {} //optional default {}
+      //}).addTo(map);
+    }//end function initMap() {
+
+    function refreshMarkers(data) {
+      pruneCluster.RemoveMarkers();
+
+      $.each(data, function (i, item) {
+        var myLat = parseFloat(item.lat.toString().replace(",", "."));
+        var myLon = parseFloat(item.lon.toString().replace(",", "."));
+        console.log("myLat: " + myLat);
+        //console.log("store LAT: " + item.Lat.toString() + " LON: " + item.Lon.toString());
+
+        var pruneMarker = new PruneCluster.Marker(myLat, myLon);
+        pruneMarker.data.storeId = item.id;
+
+        pruneCluster.RegisterMarker(pruneMarker);
+      });
+
+      pruneCluster.ProcessView();
+      pruneCluster.RedrawIcons();
+    }//end function refreshMarkers(data) {
+
+    function test(data) {
+      $.each(data, function (i, item) {
+        var s = item.id + " " + item.name;
+        console.log(s);
+      });
+
+      //for (var i = 0; i < data.length; i++) {
+      //    var s = data[i].ID + " " + data[i].NAME;
+      //    console.log("store: " + s);
+      //}
+    }
+
+  </script>
+}

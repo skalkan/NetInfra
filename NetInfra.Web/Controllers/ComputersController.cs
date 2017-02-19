@@ -7,6 +7,7 @@ using NetInfra.ViewModels;
 using NetInfra.Data;
 using Microsoft.EntityFrameworkCore;
 using NetInfra.Domain;
+using NetInfra.Web.ViewModels;
 
 namespace NetInfra.Controllers
 {
@@ -153,6 +154,42 @@ namespace NetInfra.Controllers
         //Log the error (uncomment ex variable name and write a log.)
         return RedirectToAction("Delete", new { id = id, saveChangesError = true });
       }
+    }
+
+    public IActionResult Map()
+    {
+      //List<ComputerMapViewModel> vm = new List<ComputerMapViewModel>()
+      //{
+      //  new ComputerMapViewModel { Id = 1, Name = "Computer 1", Lat = 30, Lon = 35},
+      //  new ComputerMapViewModel { Id = 1, Name = "Computer 2", Lat = 32, Lon = 37},
+      //  new ComputerMapViewModel { Id = 1, Name = "Computer 3", Lat = 34, Lon = 39}
+      //};
+
+      //if (Request.IsAjaxRequest())
+      //{
+      //  return Json(vm, JsonRequestBehavior.AllowGet);
+      //}
+
+      //return Json(vm);
+
+      return View();
+    }
+
+    public IActionResult Map2()
+    {
+      List<ComputerMapViewModel> vm = new List<ComputerMapViewModel>()
+      {
+        new ComputerMapViewModel { Id = 1, Name = "Computer 1", Lat = 30, Lon = 35},
+        new ComputerMapViewModel { Id = 1, Name = "Computer 2", Lat = 32, Lon = 37},
+        new ComputerMapViewModel { Id = 1, Name = "Computer 3", Lat = 34, Lon = 39}
+      };
+
+      //if (Request.IsAjaxRequest())
+      //{
+      //  return Json(vm, JsonRequestBehavior.AllowGet);
+      //}
+
+      return Json(vm);
     }
   }
 }

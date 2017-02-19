@@ -8,8 +8,8 @@ using NetInfra.Data;
 namespace NetInfra.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170219141800_init")]
-    partial class init
+    [Migration("20170219143135_init2")]
+    partial class init2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -193,9 +193,7 @@ namespace NetInfra.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<byte?>("AgTipId");
-
-                    b.Property<int?>("AgTipId1");
+                    b.Property<int?>("AgTipId");
 
                     b.Property<string>("Serino")
                         .IsRequired()
@@ -207,7 +205,7 @@ namespace NetInfra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AgTipId1");
+                    b.HasIndex("AgTipId");
 
                     b.ToTable("Computers");
                 });
@@ -271,7 +269,7 @@ namespace NetInfra.Data.Migrations
                 {
                     b.HasOne("NetInfra.Domain.AgTip", "AgTip")
                         .WithMany()
-                        .HasForeignKey("AgTipId1");
+                        .HasForeignKey("AgTipId");
                 });
         }
     }

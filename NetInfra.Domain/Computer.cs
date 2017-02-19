@@ -18,6 +18,6 @@ namespace NetInfra.Domain
     public AgTip AgTip { get; set; }
 
     [Display(Name = "Ağ Tipi")]
-    public byte? AgTipId { get; set; }
+    public int? AgTipId { get; set; }
   }
 }
