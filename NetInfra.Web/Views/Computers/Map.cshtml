@@ -122,62 +122,7 @@
 
 
 
-
-    //PRUNE CLUSTER CUSTOMIZATION BEGIN
-    pruneCluster.BuildLeafletCluster = function (cluster, position) {
-      var m = new L.Marker(position, {
-        icon: pruneCluster.BuildLeafletClusterIcon(cluster)
-      });
-
-      m.on('click', function () {
-        //pruneCluster._map.fire('overlappingmarkers', {
-        //    cluster: pruneCluster,
-        //    markers: markersArea,
-        //    center: m.getLatLng(),
-        //    marker: m
-        //});
-
-        // Compute the  cluster bounds (it's slow : O(n))
-        var markersArea = pruneCluster.Cluster.FindMarkersInArea(cluster.bounds);
-        var b = pruneCluster.Cluster.ComputeBounds(markersArea);
-
-        if (b) {
-          var bounds = new L.LatLngBounds(
-            new L.LatLng(b.minLat, b.maxLng),
-            new L.LatLng(b.maxLat, b.minLng));
-
-          var zoomLevelBefore = pruneCluster._map.getZoom();
-          var zoomLevelAfter = pruneCluster._map.getBoundsZoom(bounds, false, new L.Point(20, 20, null));
-
-          // If the zoom level doesn't change
-          //if (zoomLevelAfter === zoomLevelBefore) {
-          if (1 == 1) {
-            // Send an event for the LeafletSpiderfier
-            pruneCluster._map.fire('overlappingmarkers', {
-              cluster: pruneCluster,
-              markers: markersArea,
-              center: m.getLatLng(),
-              marker: m
-            });
-
-            //pruneCluster._map.setView(position, zoomLevelAfter);
-          }
-          else {
-            pruneCluster._map.fitBounds(bounds);
-          }
-        }
-      });
-      m.on('mouseover', function () {
-        //do mouseover stuff here
-        console.log("cluster mouseovered...")
-      });
-      m.on('mouseout', function () {
-        //do mouseout stuff here
-      });
-
-      return m;
-    };//pruneCluster.BuildLeafletCluster = function (cluster, position) {
-
+    // PRUNE CLUSTER CUSTOMIZATION 2 BEGIN
     pruneCluster.BuildLeafletClusterIcon = function (cluster) {
       var e = new L.Icon.MarkerCluster();
 
@@ -186,24 +131,7 @@
       return e;
     };
 
-    //pruneCluster.PrepareLeafletMarker = function(leafletMarker, data) {
-    //    leafletMarker.setIcon(/*... */); // See http://leafletjs.com/reference.html#icon
-    //    //listeners can be applied to markers in this function
-    //    leafletMarker.on('click', function(){
-    //        //do click event logic here
-    //        console.log("leaflet marker clicked: " + leafletMarker.data.storeId);
-    //    });
-    //    //A popup can already be attached to the marker
-    //    //bindPopup can override it, but it's faster to update the content instead
-    //    if (leafletMarker.getPopup()) {
-    //        leafletMarker.setPopupContent(data.name);
-    //    } else {
-    //        leafletMarker.bindPopup(data.name);
-    //    }
-    //};
-
-    //custom renkler: yeşil (0); mavi (1); turuncu (2); kırmızı (3)
-    var colors = ['#00DD2F', '#374E87', '#FFA500', '#FF4040'],
+    var colors = ['#ff4b00', '#bac900', '#EC1813', '#55BCBE', '#D2204C', '#FF0000', '#ada59a', '#3e647e'],
       pi2 = Math.PI * 2;
 
     L.Icon.MarkerCluster = L.Icon.extend({
@@ -213,7 +141,7 @@
       },
 
       createIcon: function () {
-        // based on L.Icon.Canvas from shramov/leaflet-plugins (BSD licence)
+        // based on L.Icon.Canvas from shramov/leaflet-plugins (BSD licence)
         var e = document.createElement('canvas');
         this._setIconStyles(e, 'icon');
         var s = this.options.iconSize;
@@ -228,74 +156,226 @@
       },
 
       draw: function (canvas, width, height) {
-        var xa = 2, xb = 50, ya = 18, yb = 21;
 
-        var r = ya + (this.population - xa) * ((yb - ya) / (xb - xa));
+        var lol = 0;
 
-        var radiusMarker = Math.min(r, 21),
-          radiusCenter = 11,
-          center = width / 2;
-
-        if (L.Browser.retina) {
-          canvas.scale(2, 2);
-          center /= 2;
-          canvas.lineWidth = 0.5;
-        }
-
-        canvas.strokeStyle = 'rgba(0,0,0,0.25)';
-
-        var start = 0, stroke = true;
+        var start = 0;
         for (var i = 0, l = colors.length; i < l; ++i) {
+
           var size = this.stats[i] / this.population;
 
+
           if (size > 0) {
-
-            stroke = size != 1;
-
             canvas.beginPath();
-            canvas.moveTo(center, center);
+            canvas.moveTo(22, 22);
             canvas.fillStyle = colors[i];
             var from = start + 0.14,
               to = start + size * pi2;
 
-            if (to < from || size == 1) {
+            if (to < from) {
               from = start;
             }
-            canvas.arc(center, center, radiusMarker, from, to);
+            canvas.arc(22, 22, 22, from, to);
 
             start = start + size * pi2;
-            canvas.lineTo(center, center);
+            canvas.lineTo(22, 22);
             canvas.fill();
-            if (stroke) {
-              canvas.stroke();
-            }
             canvas.closePath();
           }
-        }//end for (var i = 0, l = colors.length; i < l; ++i) {
 
-        if (!stroke) {
-          canvas.beginPath();
-          canvas.arc(center, center, radiusMarker, 0, Math.PI * 2);
-          canvas.stroke();
-          canvas.closePath();
         }
 
         canvas.beginPath();
         canvas.fillStyle = 'white';
-        canvas.moveTo(center, center);
-        canvas.arc(center, center, radiusCenter, 0, Math.PI * 2);
+        canvas.arc(22, 22, 18, 0, Math.PI * 2);
         canvas.fill();
         canvas.closePath();
 
-        canvas.fillStyle = '#454545';
+        canvas.fillStyle = '#555';
         canvas.textAlign = 'center';
         canvas.textBaseline = 'middle';
-        canvas.font = 'bold ' + (this.population < 100 ? '12' : (this.population < 1000 ? '11' : '9')) + 'px sans-serif';
+        canvas.font = 'bold 12px sans-serif';
 
-        canvas.fillText(this.population, center, center, radiusCenter * 2);
+        canvas.fillText(this.population, 22, 22, 40);
       }
-    }); //L.Icon.MarkerCluster = L.Icon.extend({
-    //PRUNE CLUSTER CUSTOMIZATION END
+    });
+    // PRUNE CLUSTER CUSTOMIZATION 2 END
+
+
+
+    ////PRUNE CLUSTER CUSTOMIZATION BEGIN
+    //pruneCluster.BuildLeafletCluster = function (cluster, position) {
+    //  var m = new L.Marker(position, {
+    //    icon: pruneCluster.BuildLeafletClusterIcon(cluster)
+    //  });
+
+    //  m.on('click', function () {
+    //    //pruneCluster._map.fire('overlappingmarkers', {
+    //    //    cluster: pruneCluster,
+    //    //    markers: markersArea,
+    //    //    center: m.getLatLng(),
+    //    //    marker: m
+    //    //});
+
+    //    // Compute the  cluster bounds (it's slow : O(n))
+    //    var markersArea = pruneCluster.Cluster.FindMarkersInArea(cluster.bounds);
+    //    var b = pruneCluster.Cluster.ComputeBounds(markersArea);
+
+    //    if (b) {
+    //      var bounds = new L.LatLngBounds(
+    //        new L.LatLng(b.minLat, b.maxLng),
+    //        new L.LatLng(b.maxLat, b.minLng));
+
+    //      var zoomLevelBefore = pruneCluster._map.getZoom();
+    //      var zoomLevelAfter = pruneCluster._map.getBoundsZoom(bounds, false, new L.Point(20, 20, null));
+
+    //      // If the zoom level doesn't change
+    //      //if (zoomLevelAfter === zoomLevelBefore) {
+    //      if (1 == 1) {
+    //        // Send an event for the LeafletSpiderfier
+    //        pruneCluster._map.fire('overlappingmarkers', {
+    //          cluster: pruneCluster,
+    //          markers: markersArea,
+    //          center: m.getLatLng(),
+    //          marker: m
+    //        });
+
+    //        //pruneCluster._map.setView(position, zoomLevelAfter);
+    //      }
+    //      else {
+    //        pruneCluster._map.fitBounds(bounds);
+    //      }
+    //    }
+    //  });
+    //  m.on('mouseover', function () {
+    //    //do mouseover stuff here
+    //    console.log("cluster mouseovered...")
+    //  });
+    //  m.on('mouseout', function () {
+    //    //do mouseout stuff here
+    //  });
+
+    //  return m;
+    //};//pruneCluster.BuildLeafletCluster = function (cluster, position) {
+
+    //pruneCluster.BuildLeafletClusterIcon = function (cluster) {
+    //  var e = new L.Icon.MarkerCluster();
+
+    //  e.stats = cluster.stats;
+    //  e.population = cluster.population;
+    //  return e;
+    //};
+
+    ////pruneCluster.PrepareLeafletMarker = function(leafletMarker, data) {
+    ////    leafletMarker.setIcon(/*... */); // See http://leafletjs.com/reference.html#icon
+    ////    //listeners can be applied to markers in this function
+    ////    leafletMarker.on('click', function(){
+    ////        //do click event logic here
+    ////        console.log("leaflet marker clicked: " + leafletMarker.data.storeId);
+    ////    });
+    ////    //A popup can already be attached to the marker
+    ////    //bindPopup can override it, but it's faster to update the content instead
+    ////    if (leafletMarker.getPopup()) {
+    ////        leafletMarker.setPopupContent(data.name);
+    ////    } else {
+    ////        leafletMarker.bindPopup(data.name);
+    ////    }
+    ////};
+
+    ////custom renkler: yeşil (0); mavi (1); turuncu (2); kırmızı (3)
+    //var colors = ['#00DD2F', '#374E87', '#FFA500', '#FF4040'],
+    //  pi2 = Math.PI * 2;
+
+    //L.Icon.MarkerCluster = L.Icon.extend({
+    //  options: {
+    //    iconSize: new L.Point(44, 44),
+    //    className: 'prunecluster leaflet-markercluster-icon'
+    //  },
+
+    //  createIcon: function () {
+    //    // based on L.Icon.Canvas from shramov/leaflet-plugins (BSD licence)
+    //    var e = document.createElement('canvas');
+    //    this._setIconStyles(e, 'icon');
+    //    var s = this.options.iconSize;
+    //    e.width = s.x;
+    //    e.height = s.y;
+    //    this.draw(e.getContext('2d'), s.x, s.y);
+    //    return e;
+    //  },
+
+    //  createShadow: function () {
+    //    return null;
+    //  },
+
+    //  draw: function (canvas, width, height) {
+    //    var xa = 2, xb = 50, ya = 18, yb = 21;
+
+    //    var r = ya + (this.population - xa) * ((yb - ya) / (xb - xa));
+
+    //    var radiusMarker = Math.min(r, 21),
+    //      radiusCenter = 11,
+    //      center = width / 2;
+
+    //    if (L.Browser.retina) {
+    //      canvas.scale(2, 2);
+    //      center /= 2;
+    //      canvas.lineWidth = 0.5;
+    //    }
+
+    //    canvas.strokeStyle = 'rgba(0,0,0,0.25)';
+
+    //    var start = 0, stroke = true;
+    //    for (var i = 0, l = colors.length; i < l; ++i) {
+    //      var size = this.stats[i] / this.population;
+
+    //      if (size > 0) {
+
+    //        stroke = size != 1;
+
+    //        canvas.beginPath();
+    //        canvas.moveTo(center, center);
+    //        canvas.fillStyle = colors[i];
+    //        var from = start + 0.14,
+    //          to = start + size * pi2;
+
+    //        if (to < from || size == 1) {
+    //          from = start;
+    //        }
+    //        canvas.arc(center, center, radiusMarker, from, to);
+
+    //        start = start + size * pi2;
+    //        canvas.lineTo(center, center);
+    //        canvas.fill();
+    //        if (stroke) {
+    //          canvas.stroke();
+    //        }
+    //        canvas.closePath();
+    //      }
+    //    }//end for (var i = 0, l = colors.length; i < l; ++i) {
+
+    //    if (!stroke) {
+    //      canvas.beginPath();
+    //      canvas.arc(center, center, radiusMarker, 0, Math.PI * 2);
+    //      canvas.stroke();
+    //      canvas.closePath();
+    //    }
+
+    //    canvas.beginPath();
+    //    canvas.fillStyle = 'white';
+    //    canvas.moveTo(center, center);
+    //    canvas.arc(center, center, radiusCenter, 0, Math.PI * 2);
+    //    canvas.fill();
+    //    canvas.closePath();
+
+    //    canvas.fillStyle = '#454545';
+    //    canvas.textAlign = 'center';
+    //    canvas.textBaseline = 'middle';
+    //    canvas.font = 'bold ' + (this.population < 100 ? '12' : (this.population < 1000 ? '11' : '9')) + 'px sans-serif';
+
+    //    canvas.fillText(this.population, center, center, radiusCenter * 2);
+    //  }
+    //}); //L.Icon.MarkerCluster = L.Icon.extend({
+    ////PRUNE CLUSTER CUSTOMIZATION END
 
 
 

@@ -180,8 +180,9 @@ namespace NetInfra.Controllers
       List<ComputerMapViewModel> vm = new List<ComputerMapViewModel>()
       {
         new ComputerMapViewModel { Id = 1, Name = "Computer 1", Status = "on", Lat = 30, Lon = 35},
-        new ComputerMapViewModel { Id = 1, Name = "Computer 2", Status = "off", Lat = 32, Lon = 37},
-        new ComputerMapViewModel { Id = 1, Name = "Computer 3", Status = "on", Lat = 34, Lon = 39}
+        new ComputerMapViewModel { Id = 2, Name = "Computer 2", Status = "off", Lat = 32, Lon = 37},
+        new ComputerMapViewModel { Id = 3, Name = "Computer 3", Status = "on", Lat = 34, Lon = 39},
+        new ComputerMapViewModel { Id = 4, Name = "Computer 4", Status = "off", Lat = 34, Lon = 39}
       };
 
       //if (Request.IsAjaxRequest())
