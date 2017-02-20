@@ -7,17 +7,17 @@
 
 <div class="col-lg-8 b-r">
   <div class="col-lg-1">
-    <h5 style="margin-top:7px">City</h5>
+    <h5 style="margin-top:7px">Name</h5>
   </div>
   <div class="col-lg-5">
-    <input id="city" type="search" name="city" class="form-control" style="width:100%" />
+    <input id="compName" type="search" name="compName" class="form-control" style="width:100%" />
   </div>
-  <div class="col-lg-1">
+  @*<div class="col-lg-1">
     <h5 style="margin-top:7px">Store</h5>
   </div>
   <div class="col-lg-5">
     <input id="store" type="search" name="store" class="form-control" style="width:100%" />
-  </div>
+  </div>*@
 </div>
 <div class="col-lg-2">
   <input id="btnDisplay" type="submit" value="Filter" class="btn btn-flex btn-block" />
@@ -26,7 +26,7 @@
   <input id="btnCancel" type="submit" value="Cancel" class="btn btn-white btn-block" />
 </div>
 
-<div id="mapid" style="width: 100%; height: 400px">
+<div id="mapid" style="width: 100%; height: 700px">
 </div>
 
 @section Scripts {
@@ -37,6 +37,8 @@
   <script src="~/lib/leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
   <link href="~/lib/PruneCluster/dist/LeafletStyleSheet.css" rel="stylesheet" />
   <script src="~/lib/PruneCluster/dist/PruneCluster.js"></script>
+  <link href="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.css" rel="stylesheet" />
+  <script src="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.min.js"></script>
 
   <style>
   </style>
@@ -55,7 +57,7 @@
           dataType: 'json',
           data: {
             'store': $('#store').val(),
-            'city': $('#city').val()
+            'compName': $('#compName').val()
           },
           contentType: 'application/json',
           url: '@Url.Action("Map2", "Computers")',
@@ -70,14 +72,14 @@
                 event.preventDefault();
                 //clear textbox values
                 $('#store').val('');
-                $('#city').val('');
+                $('#compName').val('');
 
                 $.ajax({
                     type: 'GET',
                     dataType: 'json',
                     data: {
                         'store': $('#store').val(),
-                        'city': $('#city').val()
+                        'compName': $('#compName').val()
                     },
                     contentType: 'application/json',
                     url: '@Url.Action("Map2", "Computers")',
@@ -131,7 +133,11 @@
       return e;
     };
 
-    var colors = ['#ff4b00', '#bac900', '#EC1813', '#55BCBE', '#D2204C', '#FF0000', '#ada59a', '#3e647e'],
+    //var colors = ['#ff4b00', '#bac900', '#EC1813', '#55BCBE', '#D2204C', '#FF0000', '#ada59a', '#3e647e'],
+    //  pi2 = Math.PI * 2;
+
+    //custom renkler: yeşil (0); mavi (1); turuncu (2); kırmızı (3)
+    var colors = ['#00DD2F', '#374E87', '#FFA500', '#FF4040'],
       pi2 = Math.PI * 2;
 
     L.Icon.MarkerCluster = L.Icon.extend({
@@ -393,18 +399,18 @@
 
       L.control.layers(baseMaps, overlayMaps, { position: "bottomleft" }).addTo(map);
 
-      //L.control.coordinates({
-      //  position: "bottomright", //optional default "bootomright"
-      //  decimals: 2, //optional default 4
-      //  decimalSeperator: ".", //optional default "."
-      //  labelTemplateLat: "Lat: {y}", //optional default "Lat: {y}"
-      //  labelTemplateLng: "Lon: {x}", //optional default "Lng: {x}"
-      //  enableUserInput: false, //optional default true
-      //  useDMS: false, //optional default false
-      //  useLatLngOrder: true, //ordering of labels, default false-> lng-lat
-      //  markerType: L.marker, //optional default L.marker
-      //  markerProps: {} //optional default {}
-      //}).addTo(map);
+      L.control.coordinates({
+        position: "bottomright", //optional default "bootomright"
+        decimals: 4, //optional default 4
+        decimalSeperator: ".", //optional default "."
+        labelTemplateLat: "Lat: {y}", //optional default "Lat: {y}"
+        labelTemplateLng: "Lng: {x}", //optional default "Lng: {x}"
+        enableUserInput: false, //optional default true
+        useDMS: false, //optional default false
+        useLatLngOrder: true, //ordering of labels, default false-> lng-lat
+        markerType: L.marker, //optional default L.marker
+        markerProps: {} //optional default {}
+      }).addTo(map);
 
       //DELETE after test
       // Add markers to map
@@ -441,11 +447,11 @@
           "<tr><th style='color:#397692'>Lat</th><td>: " + item.lat + " </td></tr>" +
           "<tr><th style='color:#397692'>Lon</th><td>: " + item.lon + " </td></tr></table>");
 
-        var redIcon = L.AwesomeMarkers.icon({ icon: 'check', prefix: 'fa', markerColor: 'red', iconColor: 'white', spin: false });
+        var redIcon = L.AwesomeMarkers.icon({ icon: 'fa-desktop', prefix: 'fa', markerColor: 'red', iconColor: 'white', spin: false });
         var yellowIcon = L.AwesomeMarkers.icon({ icon: 'check', prefix: 'fa', markerColor: 'yellow', iconColor: 'white', spin: false });
         var blueIcon = L.AwesomeMarkers.icon({ icon: 'check', prefix: 'fa', markerColor: 'blue', iconColor: 'white', spin: false });
-        var greenIcon = L.AwesomeMarkers.icon({ icon: 'check', prefix: 'fa', markerColor: 'green', iconColor: 'white', spin: false });
-        var redIconAlm = L.AwesomeMarkers.icon({ icon: 'bell', prefix: 'fa', markerColor: 'red', iconColor: 'white', spin: true });
+        var greenIcon = L.AwesomeMarkers.icon({ icon: 'fa-desktop', prefix: 'fa', markerColor: 'green', iconColor: 'white', spin: false });
+        var redIconAlm = L.AwesomeMarkers.icon({ icon: 'server', prefix: 'fa', markerColor: 'red', iconColor: 'white', spin: true });
         var yellowIconAlm = L.AwesomeMarkers.icon({ icon: 'check', prefix: 'fa', markerColor: 'yellow', iconColor: 'white', spin: true });
         var blueIconAlm = L.AwesomeMarkers.icon({ icon: 'bell', prefix: 'fa', markerColor: 'blue', iconColor: 'white', spin: true });
         var greenIconAlm = L.AwesomeMarkers.icon({ icon: 'bell', prefix: 'fa', markerColor: 'green', iconColor: 'white', spin: true });
@@ -456,7 +462,7 @@
         }
         else if (myStatus == "off") {
           pruneMarker.data.icon = redIconAlm;
-          pruneMarker.category = 1;
+          pruneMarker.category = 3;
         }
 
         pruneCluster.RegisterMarker(pruneMarker);
