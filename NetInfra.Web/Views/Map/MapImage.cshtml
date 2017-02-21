@@ -1,0 +1,56 @@
+﻿@model IEnumerable<ComputerMapViewModel>
+  @using Microsoft.AspNetCore.Html
+
+  @{
+    ViewBag.Title = "Image Map";
+  }
+
+  <div id="mapid" style="width: 100%; height: 700px">
+  </div>
+
+  @section Scripts {
+    <script src="~/lib/leaflet/dist/leaflet.js"></script>
+    <link href="~/lib/leaflet/dist/leaflet.css" rel="stylesheet" />
+    <link href="~/lib/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link href="~/lib/leaflet.awesome-markers/dist/leaflet.awesome-markers.css" rel="stylesheet" />
+    <script src="~/lib/leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
+    <link href="~/lib/PruneCluster/dist/LeafletStyleSheet.css" rel="stylesheet" />
+    <script src="~/lib/PruneCluster/dist/PruneCluster.js"></script>
+    <link href="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.css" rel="stylesheet" />
+    <script src="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.min.js"></script>
+
+    <style>
+    </style>
+
+    <script>
+      $(document).ready(function () {
+        initMap();
+
+
+      });//end $(document).ready(function () {
+
+      var map;
+
+      function initMap() {
+        map = L.map('mapid', {
+          crs: L.CRS.Simple,
+          maxZoom: 3,
+          minZoom: -1
+        });
+
+        var bounds = [[0, 0], [600, 800]];
+        var image = L.imageOverlay('/images/Bina-A_Kat-2.png', bounds).addTo(map);
+
+        var pc1 = L.latLng([300, 400]);
+        var marker = L.marker(pc1).addTo(map);
+        marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+
+        map.fitBounds(bounds);
+      }//end function initMap() {
+
+      function refreshMarkers(data) {
+
+      }
+
+    </script>
+  }

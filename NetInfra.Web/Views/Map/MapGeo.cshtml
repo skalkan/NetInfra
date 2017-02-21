@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Html
 
 @{
-  ViewBag.Title = "Map";
+  ViewBag.Title = "Overview Map";
 }
 
 <div class="col-lg-8 b-r">
@@ -60,7 +60,7 @@
             'compName': $('#compName').val()
           },
           contentType: 'application/json',
-          url: '@Url.Action("Map2", "Computers")',
+          url: '@Url.Action("DataGeo", "Map")',
                     success: function (data) {
                         //test(data);
                         refreshMarkers(data);
@@ -82,7 +82,7 @@
                         'compName': $('#compName').val()
                     },
                     contentType: 'application/json',
-                    url: '@Url.Action("Map2", "Computers")',
+                    url: '@Url.Action("DataGeo", "Map")',
                     success: function (data) {
                         test(data);
                         refreshMarkers(data);
@@ -94,20 +94,20 @@
 
     var map;
     var streetMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 17,
+      maxZoom: 19,
       detectRetina: true,
       attribution: '&copy; OpenStreetMap contributors'
     });
     var imageMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/' + 'rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       //minZoom: 10,
-      maxZoom: 17,
+      maxZoom: 19,
       detectRetina: true,
       attribution: 'Tiles © Esri — '
       + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, '
       + 'Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     });
     var topoMap = L.tileLayer('http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-      maxZoom: 17,
+      maxZoom: 19,
       detectRetina: true,
       attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
@@ -393,7 +393,7 @@
     function initMap() {
       map = L.map('mapid', {
         center: [37, 34], //TODO: center verilerin orta noktası olmalı, bounds?
-        zoom: 5,
+        zoom: 6,
         layers: [streetMap, pruneCluster]
       });
 
