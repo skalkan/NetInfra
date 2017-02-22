@@ -383,14 +383,17 @@ var PruneClusterForLeaflet = (L.Layer ? L.Layer : L.Class).extend({
             if (b) {
                 var bounds = new L.LatLngBounds(new L.LatLng(b.minLat, b.maxLng), new L.LatLng(b.maxLat, b.minLng));
                 var zoomLevelBefore = _this._map.getZoom(), zoomLevelAfter = _this._map.getBoundsZoom(bounds, false, new L.Point(20, 20));
-                if (zoomLevelAfter === zoomLevelBefore) {
+                // skalkan modified line below 22-02-2017
+                //if (zoomLevelAfter === zoomLevelBefore) {
+                if (1 == 1) {
                     _this._map.fire('overlappingmarkers', {
                         cluster: _this,
                         markers: markersArea,
                         center: m.getLatLng(),
                         marker: m
                     });
-                    _this._map.setView(position, zoomLevelAfter);
+                    // skalkan commented out line below 22-02-2017
+                    //_this._map.setView(position, zoomLevelAfter);
                 }
                 else {
                     _this._map.fitBounds(bounds);
