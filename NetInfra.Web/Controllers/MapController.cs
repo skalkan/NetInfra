@@ -9,12 +9,12 @@ namespace NetInfra.Web.Controllers
 {
   public class MapController : Controller
   {
-    public IActionResult MapGeo()
+    public IActionResult GeoMap()
     {
       return View();
     }
 
-    public IActionResult DataGeo(string compName = null)
+    public IActionResult GeoData(string compName = null)
     {
       List<ComputerMapViewModel> vm = new List<ComputerMapViewModel>()
       {
@@ -37,12 +37,18 @@ namespace NetInfra.Web.Controllers
       return Json(vm);
     }
 
-    public IActionResult MapImage()
+    public IActionResult ImageMap()
     {
-      return View();
+      var vm = new ImageMapViewModel
+      {
+        //ImagePath = "/images/Bina-A_Kat-2.png"
+        ImagePath = "/images/Kisla.jpg"
+      };
+
+      return View(vm);
     }
 
-    public IActionResult DataImage()
+    public IActionResult ImageData()
     {
       return View();
     }

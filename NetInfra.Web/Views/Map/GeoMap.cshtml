@@ -1,0 +1,489 @@
+﻿@model IEnumerable<ComputerMapViewModel>
+@using Microsoft.AspNetCore.Html
+
+@{
+  ViewBag.Title = "Overview Map";
+}
+
+<div class="col-lg-8 b-r">
+  <div class="col-lg-1">
+    <h5 style="margin-top:7px">Name</h5>
+  </div>
+  <div class="col-lg-5">
+    <input id="compName" type="search" name="compName" class="form-control" style="width:100%" />
+  </div>
+  @*<div class="col-lg-1">
+    <h5 style="margin-top:7px">Store</h5>
+  </div>
+  <div class="col-lg-5">
+    <input id="store" type="search" name="store" class="form-control" style="width:100%" />
+  </div>*@
+</div>
+<div class="col-lg-2">
+  <input id="btnDisplay" type="submit" value="Filter" class="btn btn-flex btn-block" />
+</div>
+<div class="col-lg-2">
+  <input id="btnCancel" type="submit" value="Cancel" class="btn btn-white btn-block" />
+</div>
+
+<div id="mapid" style="width: 100%; height: 700px">
+</div>
+
+@section Scripts {
+  <script src="~/lib/leaflet/dist/leaflet.js"></script>
+  <link href="~/lib/leaflet/dist/leaflet.css" rel="stylesheet" />
+  <link href="~/lib/font-awesome/css/font-awesome.css" rel="stylesheet" />
+  <link href="~/lib/leaflet.awesome-markers/dist/leaflet.awesome-markers.css" rel="stylesheet" />
+  <script src="~/lib/leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
+  <link href="~/lib/PruneCluster/dist/LeafletStyleSheet.css" rel="stylesheet" />
+  <script src="~/lib/PruneCluster/dist/PruneCluster.js"></script>
+  <link href="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.css" rel="stylesheet" />
+  <script src="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.min.js"></script>
+
+  <style>
+  </style>
+
+  <script>
+    $(document).ready(function () {
+      //var data = @@Json.Serialize(Model); //JSON.parse('@@Html.Raw(Json.Encode(Model))');
+      //refreshMarkers(data);
+
+      initMap();
+
+      $('#btnDisplay').click(function () {
+        event.preventDefault();
+        $.ajax({
+          type: 'GET',
+          dataType: 'json',
+          data: {
+            'store': $('#store').val(),
+            'compName': $('#compName').val()
+          },
+          contentType: 'application/json',
+          url: '@Url.Action("GeoData", "Map")',
+                    success: function (data) {
+                        //test(data);
+                        refreshMarkers(data);
+                    }
+                });
+            });//end $('#btnDisplay').click(function () {
+
+      $('#btnCancel').click(function () {
+                event.preventDefault();
+                //clear textbox values
+                $('#store').val('');
+                $('#compName').val('');
+
+                $.ajax({
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        'store': $('#store').val(),
+                        'compName': $('#compName').val()
+                    },
+                    contentType: 'application/json',
+                    url: '@Url.Action("GeoData", "Map")',
+                    success: function (data) {
+                        test(data);
+                        refreshMarkers(data);
+                    }
+                });
+            });//end $('#btnDisplay').click(function () {
+
+    });//end $(document).ready(function () {
+
+    var map;
+    var streetMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      detectRetina: true,
+      attribution: '&copy; OpenStreetMap contributors'
+    });
+    var imageMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/' + 'rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      //minZoom: 10,
+      maxZoom: 19,
+      detectRetina: true,
+      attribution: 'Tiles © Esri — '
+      + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, '
+      + 'Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+    var topoMap = L.tileLayer('http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      detectRetina: true,
+      attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    });
+    var baseMaps = {
+      "StreetMap": streetMap,
+      "ImageMap": imageMap,
+      "TopoMap": topoMap
+    };
+
+    //PRUNE-CLUSTER
+    var pruneCluster = new PruneClusterForLeaflet();
+    pruneCluster.Cluster.Size = 10;
+    pruneCluster.zoomToBoundsOnClick = false;
+
+
+
+    // PRUNE CLUSTER CUSTOMIZATION 2 BEGIN
+    pruneCluster.BuildLeafletClusterIcon = function (cluster) {
+      var e = new L.Icon.MarkerCluster();
+
+      e.stats = cluster.stats;
+      e.population = cluster.population;
+      return e;
+    };
+
+    //var colors = ['#ff4b00', '#bac900', '#EC1813', '#55BCBE', '#D2204C', '#FF0000', '#ada59a', '#3e647e'],
+    //  pi2 = Math.PI * 2;
+
+    //custom renkler: yeşil (0); mavi (1); turuncu (2); kırmızı (3)
+    var colors = ['#00DD2F', '#374E87', '#FFA500', '#FF4040'],
+      pi2 = Math.PI * 2;
+
+    L.Icon.MarkerCluster = L.Icon.extend({
+      options: {
+        iconSize: new L.Point(44, 44),
+        className: 'prunecluster leaflet-markercluster-icon'
+      },
+
+      createIcon: function () {
+        // based on L.Icon.Canvas from shramov/leaflet-plugins (BSD licence)
+        var e = document.createElement('canvas');
+        this._setIconStyles(e, 'icon');
+        var s = this.options.iconSize;
+        e.width = s.x;
+        e.height = s.y;
+        this.draw(e.getContext('2d'), s.x, s.y);
+        return e;
+      },
+
+      createShadow: function () {
+        return null;
+      },
+
+      draw: function (canvas, width, height) {
+
+        var lol = 0;
+
+        var start = 0;
+        for (var i = 0, l = colors.length; i < l; ++i) {
+
+          var size = this.stats[i] / this.population;
+
+
+          if (size > 0) {
+            canvas.beginPath();
+            canvas.moveTo(22, 22);
+            canvas.fillStyle = colors[i];
+            var from = start + 0.14,
+              to = start + size * pi2;
+
+            if (to < from) {
+              from = start;
+            }
+            canvas.arc(22, 22, 22, from, to);
+
+            start = start + size * pi2;
+            canvas.lineTo(22, 22);
+            canvas.fill();
+            canvas.closePath();
+          }
+
+        }
+
+        canvas.beginPath();
+        canvas.fillStyle = 'white';
+        canvas.arc(22, 22, 18, 0, Math.PI * 2);
+        canvas.fill();
+        canvas.closePath();
+
+        canvas.fillStyle = '#555';
+        canvas.textAlign = 'center';
+        canvas.textBaseline = 'middle';
+        canvas.font = 'bold 12px sans-serif';
+
+        canvas.fillText(this.population, 22, 22, 40);
+      }
+    });
+    // PRUNE CLUSTER CUSTOMIZATION 2 END
+
+
+
+    ////PRUNE CLUSTER CUSTOMIZATION BEGIN
+    //pruneCluster.BuildLeafletCluster = function (cluster, position) {
+    //  var m = new L.Marker(position, {
+    //    icon: pruneCluster.BuildLeafletClusterIcon(cluster)
+    //  });
+
+    //  m.on('click', function () {
+    //    //pruneCluster._map.fire('overlappingmarkers', {
+    //    //    cluster: pruneCluster,
+    //    //    markers: markersArea,
+    //    //    center: m.getLatLng(),
+    //    //    marker: m
+    //    //});
+
+    //    // Compute the  cluster bounds (it's slow : O(n))
+    //    var markersArea = pruneCluster.Cluster.FindMarkersInArea(cluster.bounds);
+    //    var b = pruneCluster.Cluster.ComputeBounds(markersArea);
+
+    //    if (b) {
+    //      var bounds = new L.LatLngBounds(
+    //        new L.LatLng(b.minLat, b.maxLng),
+    //        new L.LatLng(b.maxLat, b.minLng));
+
+    //      var zoomLevelBefore = pruneCluster._map.getZoom();
+    //      var zoomLevelAfter = pruneCluster._map.getBoundsZoom(bounds, false, new L.Point(20, 20, null));
+
+    //      // If the zoom level doesn't change
+    //      //if (zoomLevelAfter === zoomLevelBefore) {
+    //      if (1 == 1) {
+    //        // Send an event for the LeafletSpiderfier
+    //        pruneCluster._map.fire('overlappingmarkers', {
+    //          cluster: pruneCluster,
+    //          markers: markersArea,
+    //          center: m.getLatLng(),
+    //          marker: m
+    //        });
+
+    //        //pruneCluster._map.setView(position, zoomLevelAfter);
+    //      }
+    //      else {
+    //        pruneCluster._map.fitBounds(bounds);
+    //      }
+    //    }
+    //  });
+    //  m.on('mouseover', function () {
+    //    //do mouseover stuff here
+    //    console.log("cluster mouseovered...")
+    //  });
+    //  m.on('mouseout', function () {
+    //    //do mouseout stuff here
+    //  });
+
+    //  return m;
+    //};//pruneCluster.BuildLeafletCluster = function (cluster, position) {
+
+    //pruneCluster.BuildLeafletClusterIcon = function (cluster) {
+    //  var e = new L.Icon.MarkerCluster();
+
+    //  e.stats = cluster.stats;
+    //  e.population = cluster.population;
+    //  return e;
+    //};
+
+    ////pruneCluster.PrepareLeafletMarker = function(leafletMarker, data) {
+    ////    leafletMarker.setIcon(/*... */); // See http://leafletjs.com/reference.html#icon
+    ////    //listeners can be applied to markers in this function
+    ////    leafletMarker.on('click', function(){
+    ////        //do click event logic here
+    ////        console.log("leaflet marker clicked: " + leafletMarker.data.storeId);
+    ////    });
+    ////    //A popup can already be attached to the marker
+    ////    //bindPopup can override it, but it's faster to update the content instead
+    ////    if (leafletMarker.getPopup()) {
+    ////        leafletMarker.setPopupContent(data.name);
+    ////    } else {
+    ////        leafletMarker.bindPopup(data.name);
+    ////    }
+    ////};
+
+    ////custom renkler: yeşil (0); mavi (1); turuncu (2); kırmızı (3)
+    //var colors = ['#00DD2F', '#374E87', '#FFA500', '#FF4040'],
+    //  pi2 = Math.PI * 2;
+
+    //L.Icon.MarkerCluster = L.Icon.extend({
+    //  options: {
+    //    iconSize: new L.Point(44, 44),
+    //    className: 'prunecluster leaflet-markercluster-icon'
+    //  },
+
+    //  createIcon: function () {
+    //    // based on L.Icon.Canvas from shramov/leaflet-plugins (BSD licence)
+    //    var e = document.createElement('canvas');
+    //    this._setIconStyles(e, 'icon');
+    //    var s = this.options.iconSize;
+    //    e.width = s.x;
+    //    e.height = s.y;
+    //    this.draw(e.getContext('2d'), s.x, s.y);
+    //    return e;
+    //  },
+
+    //  createShadow: function () {
+    //    return null;
+    //  },
+
+    //  draw: function (canvas, width, height) {
+    //    var xa = 2, xb = 50, ya = 18, yb = 21;
+
+    //    var r = ya + (this.population - xa) * ((yb - ya) / (xb - xa));
+
+    //    var radiusMarker = Math.min(r, 21),
+    //      radiusCenter = 11,
+    //      center = width / 2;
+
+    //    if (L.Browser.retina) {
+    //      canvas.scale(2, 2);
+    //      center /= 2;
+    //      canvas.lineWidth = 0.5;
+    //    }
+
+    //    canvas.strokeStyle = 'rgba(0,0,0,0.25)';
+
+    //    var start = 0, stroke = true;
+    //    for (var i = 0, l = colors.length; i < l; ++i) {
+    //      var size = this.stats[i] / this.population;
+
+    //      if (size > 0) {
+
+    //        stroke = size != 1;
+
+    //        canvas.beginPath();
+    //        canvas.moveTo(center, center);
+    //        canvas.fillStyle = colors[i];
+    //        var from = start + 0.14,
+    //          to = start + size * pi2;
+
+    //        if (to < from || size == 1) {
+    //          from = start;
+    //        }
+    //        canvas.arc(center, center, radiusMarker, from, to);
+
+    //        start = start + size * pi2;
+    //        canvas.lineTo(center, center);
+    //        canvas.fill();
+    //        if (stroke) {
+    //          canvas.stroke();
+    //        }
+    //        canvas.closePath();
+    //      }
+    //    }//end for (var i = 0, l = colors.length; i < l; ++i) {
+
+    //    if (!stroke) {
+    //      canvas.beginPath();
+    //      canvas.arc(center, center, radiusMarker, 0, Math.PI * 2);
+    //      canvas.stroke();
+    //      canvas.closePath();
+    //    }
+
+    //    canvas.beginPath();
+    //    canvas.fillStyle = 'white';
+    //    canvas.moveTo(center, center);
+    //    canvas.arc(center, center, radiusCenter, 0, Math.PI * 2);
+    //    canvas.fill();
+    //    canvas.closePath();
+
+    //    canvas.fillStyle = '#454545';
+    //    canvas.textAlign = 'center';
+    //    canvas.textBaseline = 'middle';
+    //    canvas.font = 'bold ' + (this.population < 100 ? '12' : (this.population < 1000 ? '11' : '9')) + 'px sans-serif';
+
+    //    canvas.fillText(this.population, center, center, radiusCenter * 2);
+    //  }
+    //}); //L.Icon.MarkerCluster = L.Icon.extend({
+    ////PRUNE CLUSTER CUSTOMIZATION END
+
+
+
+
+    var overlayMaps = {
+      "Stores": pruneCluster
+    };
+
+    function initMap() {
+      map = L.map('mapid', {
+        center: [37, 34], //TODO: center verilerin orta noktası olmalı, bounds?
+        zoom: 6,
+        layers: [streetMap, pruneCluster]
+      });
+
+      L.control.layers(baseMaps, overlayMaps, { position: "bottomleft" }).addTo(map);
+
+      L.control.coordinates({
+        position: "bottomright", //optional default "bootomright"
+        decimals: 4, //optional default 4
+        decimalSeperator: ".", //optional default "."
+        labelTemplateLat: "Lat: {y}", //optional default "Lat: {y}"
+        labelTemplateLng: "Lng: {x}", //optional default "Lng: {x}"
+        enableUserInput: false, //optional default true
+        useDMS: false, //optional default false
+        useLatLngOrder: true, //ordering of labels, default false-> lng-lat
+        markerType: L.marker, //optional default L.marker
+        markerProps: {} //optional default {}
+      }).addTo(map);
+
+      //DELETE after test
+      // Add markers to map
+      // Font-Awesome markers
+      L.marker([51.941196, 4.512291], { icon: L.AwesomeMarkers.icon({ icon: 'spinner', markerColor: 'red', prefix: 'fa', spin: true }) }).addTo(map);
+      L.marker([51.927913, 4.521303], { icon: L.AwesomeMarkers.icon({ icon: 'coffee', markerColor: 'orange', prefix: 'fa', iconColor: 'black' }) }).addTo(map);
+      L.marker([51.936063, 4.502077], { icon: L.AwesomeMarkers.icon({ icon: 'cog', prefix: 'fa', markerColor: 'purple', iconColor: '#6b1d5c' }) }).addTo(map);
+
+      // Glyphicons
+      L.marker([51.932835, 4.506969], { icon: L.AwesomeMarkers.icon({ icon: 'star', prefix: 'glyphicon', markerColor: 'green' }) }).addTo(map);
+      L.marker([51.930295, 4.515209], { icon: L.AwesomeMarkers.icon({ icon: 'certificate', prefix: 'glyphicon', markerColor: 'blue' }) }).addTo(map);
+      L.marker([51.930083, 4.507742], { icon: L.AwesomeMarkers.icon({ icon: 'cog', prefix: 'glyphicon', markerColor: 'cadetblue' }) }).addTo(map);
+
+
+
+    }//end function initMap() {
+
+    function refreshMarkers(data) {
+      pruneCluster.RemoveMarkers();
+
+      $.each(data, function (i, item) {
+        var myLat = parseFloat(item.lat.toString().replace(",", "."));
+        var myLon = parseFloat(item.lon.toString().replace(",", "."));
+        var myStatus = item.status;
+
+        console.log(item);
+        //console.log("store LAT: " + item.Lat.toString() + " LON: " + item.Lon.toString());
+
+        var pruneMarker = new PruneCluster.Marker(myLat, myLon);
+        pruneMarker.data.storeId = item.id;
+        pruneMarker.data.popup = ("<h4 class='text-center' style='color:#d26143'>" + item.name + "</h4>" +
+          "<table class='table table-striped'>" +
+          "<tr><th style='color:#397692'>Status</th><td>: " + item.status + "</td></tr>" +
+          "<tr><th style='color:#397692'>Lat</th><td>: " + item.lat + " </td></tr>" +
+          "<tr><th style='color:#397692'>Lon</th><td>: " + item.lon + " </td></tr></table>");
+
+        var redIcon = L.AwesomeMarkers.icon({ icon: 'fa-desktop', prefix: 'fa', markerColor: 'red', iconColor: 'white', spin: false });
+        var yellowIcon = L.AwesomeMarkers.icon({ icon: 'check', prefix: 'fa', markerColor: 'yellow', iconColor: 'white', spin: false });
+        var blueIcon = L.AwesomeMarkers.icon({ icon: 'check', prefix: 'fa', markerColor: 'blue', iconColor: 'white', spin: false });
+        var greenIcon = L.AwesomeMarkers.icon({ icon: 'fa-desktop', prefix: 'fa', markerColor: 'green', iconColor: 'white', spin: false });
+        var redIconAlm = L.AwesomeMarkers.icon({ icon: 'server', prefix: 'fa', markerColor: 'red', iconColor: 'white', spin: true });
+        var yellowIconAlm = L.AwesomeMarkers.icon({ icon: 'check', prefix: 'fa', markerColor: 'yellow', iconColor: 'white', spin: true });
+        var blueIconAlm = L.AwesomeMarkers.icon({ icon: 'bell', prefix: 'fa', markerColor: 'blue', iconColor: 'white', spin: true });
+        var greenIconAlm = L.AwesomeMarkers.icon({ icon: 'bell', prefix: 'fa', markerColor: 'green', iconColor: 'white', spin: true });
+
+        if (myStatus == "on") {
+          pruneMarker.data.icon = greenIcon;
+          pruneMarker.category = 0;
+        }
+        else if (myStatus == "off") {
+          pruneMarker.data.icon = redIconAlm;
+          pruneMarker.category = 3;
+        }
+
+        pruneCluster.RegisterMarker(pruneMarker);
+      });
+
+      pruneCluster.ProcessView();
+      pruneClus
+      ter.RedrawIcons();
+    }//end function refreshMarkers(data) {
+
+    function test(data) {
+      $.each(data, function (i, item) {
+        var s = item.id + " " + item.name;
+        console.log(s);
+      });
+
+      //for (var i = 0; i < data.length; i++) {
+      //    var s = data[i].ID + " " + data[i].NAME;
+      //    console.log("store: " + s);
+      //}
+    }
+
+  </script>
+}

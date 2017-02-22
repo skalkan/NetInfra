@@ -9,6 +9,7 @@
     "jquery-validation-unobtrusive": "3.2.6",
     "leaflet": "1.0.3",
     "leaflet.awesome-markers": "2.0.2",
+    "leaflet.contextmenu": "1.2.1",
     "leaflet.coordinates": "0.1.5",
     "PruneCluster": "1.1.0"
   }
