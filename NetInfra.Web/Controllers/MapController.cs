@@ -42,7 +42,9 @@ namespace NetInfra.Web.Controllers
       var vm = new ImageMapViewModel
       {
         //ImagePath = "/images/Bina-A_Kat-2.png"
-        ImagePath = "/images/Kisla.jpg"
+        ImagePath = "/images/Kisla.jpg",
+        x_points = { 1549, 1498, 1456, 1508, 1549 },
+        y_points = { 2399, 2263, 2281, 2417, 2399 }
       };
 
       return View(vm);

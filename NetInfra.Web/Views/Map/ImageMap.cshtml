@@ -21,6 +21,8 @@
   <link href="~/lib/leaflet.contextmenu/dist/leaflet.contextmenu.css" rel="stylesheet" />
   <script src="~/lib/leaflet.contextmenu/dist/leaflet.contextmenu.js"></script>
 
+  <script src="~/js/binalar-polygon-json.js"></script>
+
   <style>
   </style>
 
@@ -28,19 +30,19 @@
       $(document).ready(function () {
         initMap();
 
-        var bina_y = L.polygon([[2399, 1549], [2263, 1498], [2281, 1456], [2417, 1508], [2399, 1549]],
-          {
-            contextmenu: true,
-            contextmenuItems: [{
-              text: 'Marker item',
-              index: 0
-            }, {
-              separator: true,
-              index: 1
-            }]
-          },
-          { color: 'red' }).addTo(map);
-        bina_y.bindPopup("Test...");
+        //var bina_y = L.polygon([[2399, 1549], [2263, 1498], [2281, 1456], [2417, 1508], [2399, 1549]],
+        //  {
+        //    contextmenu: true,
+        //    contextmenuItems: [{
+        //      text: 'Marker item',
+        //      index: 0
+        //    }, {
+        //      separator: true,
+        //      index: 1
+        //    }]
+        //  },
+        //  { color: 'red' }).addTo(map);
+        //bina_y.bindPopup("Test...");
 
       });//end $(document).ready(function () {
 
@@ -72,19 +74,17 @@
           console.log(ev.latlng); // ev is an event object (MouseEvent in this case)
         });
 
+        //L.geoJSON(bina_d).addTo(map);
+        L.geoJSON(bina_y).addTo(map);
+        L.geoJSON(myLines).addTo(map);
+        //L.geoJSON(myPolygons).addTo(map);
+
         
-        var bina_d = L.polygon([[3474, 1828], [3431, 1810], [3393, 1910], [3432, 1930], [3474, 1828]],
-          {
-            contextmenu: true,
-            contextmenuInheritItems: false,
-            contextmenuItems: [{
-              text: 'Marker item'
-            }]
-          },
-          { color: 'red' }).addTo(map);
         var bina_m = L.polygon([[3208, 2703], [3158, 2685], [3135, 2732], [3127, 2727], [3135, 2707],
           [3107, 2697], [3092, 2718], [3086, 2743], [3113, 2753], [3121, 2741], [3129, 2747], [3095, 2835],
           [3144, 2855]], { color: 'red' }).addTo(map);
+
+
 
       }//end function initMap() {
 
