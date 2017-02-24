@@ -40,7 +40,22 @@
   <link href="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.css" rel="stylesheet" />
   <script src="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.min.js"></script>
 
+  <script src="~/js/binalar.js"></script>
+
   <style>
+    .info {
+      padding: 6px 8px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+
+      .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+      }
   </style>
 
   <script>
@@ -384,6 +399,10 @@
     ////PRUNE CLUSTER CUSTOMIZATION END
 
 
+    
+    
+
+
 
 
     var overlayMaps = {
@@ -425,6 +444,93 @@
       L.marker([51.930083, 4.507742], { icon: L.AwesomeMarkers.icon({ icon: 'cog', prefix: 'glyphicon', markerColor: 'cadetblue' }) }).addTo(map);
 
 
+      // INFO CONTROL BEGIN
+      
+      // control that shows state info on hover
+      var info = L.control();
+
+      info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info');
+        this.update();
+        return this._div;
+      };
+      
+      info.update = function (props) {
+        this._div.innerHTML = '<h4>Ders Binaları</h4>' + (props ?
+          '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
+          : 'Hover over a state');
+      };
+
+      info.addTo(map);
+
+
+      // get color depending on population density value
+      function getColor(d) {
+        return d > 1000 ? '#800026' :
+          d > 500 ? '#BD0026' :
+            d > 200 ? '#E31A1C' :
+              d > 100 ? '#FC4E2A' :
+                d > 50 ? '#FD8D3C' :
+                  d > 20 ? '#FEB24C' :
+                    d > 10 ? '#FED976' :
+                      '#FFEDA0';
+      }
+
+      function style(feature) {
+        return {
+          weight: 2,
+          opacity: 1,
+          color: 'white',
+          dashArray: '3',
+          fillOpacity: 0.7,
+          fillColor: getColor(feature.properties.density)
+        };
+      }
+
+      function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+          weight: 5,
+          color: '#666',
+          dashArray: '',
+          fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront();
+        }
+
+        info.update(layer.feature.properties);
+      }
+
+      var geojson;
+
+      function resetHighlight(e) {
+        geojson.resetStyle(e.target);
+        info.update();
+      }
+
+      function zoomToFeature(e) {
+        map.fitBounds(e.target.getBounds());
+      }
+
+      function onEachFeature(feature, layer) {
+        layer.on({
+          mouseover: highlightFeature,
+          mouseout: resetHighlight,
+          click: zoomToFeature
+        });
+      }
+
+      geojson = L.geoJson(binalarData, {
+        style: style,
+        onEachFeature: onEachFeature
+      }).addTo(map);
+
+      // INFO CONTROL END
+
+      // L.geoJSON(binalarData).addTo(map);
 
     }//end function initMap() {
 
@@ -469,8 +575,7 @@
       });
 
       pruneCluster.ProcessView();
-      pruneClus
-      ter.RedrawIcons();
+      pruneCluster.RedrawIcons();
     }//end function refreshMarkers(data) {
 
     function test(data) {
