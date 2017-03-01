@@ -39,6 +39,8 @@
   <script src="~/lib/PruneCluster/dist/PruneCluster.js"></script>
   <link href="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.css" rel="stylesheet" />
   <script src="~/lib/leaflet.coordinates/dist/Leaflet.Coordinates-0.1.5.min.js"></script>
+  <script src="~/lib/leaflet.contextmenu/dist/leaflet.contextmenu.min.js"></script>
+  <link href="~/lib/leaflet.contextmenu/dist/leaflet.contextmenu.min.css" rel="stylesheet" />
 
   <script src="~/js/binalar.js"></script>
 
@@ -60,10 +62,11 @@
 
   <script>
     $(document).ready(function () {
-      //var data = @@Json.Serialize(Model); //JSON.parse('@@Html.Raw(Json.Encode(Model))');
-      //refreshMarkers(data);
-
       initMap();
+
+      //var data = JSON.parse('@@Html.Raw(Json.Encode(Model))');
+      var data = @Json.Serialize(Model);
+      refreshMarkers(data);
 
       $('#btnDisplay').click(function () {
         event.preventDefault();
@@ -546,10 +549,12 @@
         //console.log("store LAT: " + item.Lat.toString() + " LON: " + item.Lon.toString());
 
         var pruneMarker = new PruneCluster.Marker(myLat, myLon);
+
         pruneMarker.data.storeId = item.id;
+
         myHref = '@Url.Action("Edit", "Computers")?id=' + item.id;
-        pruneMarker.data.popup = ("<h4 class='text-center' style='color:#d26143'>" + item.name + "</h4>" +
-          "<a href=" + '@Url.Action("Edit", "Computers")?id=' + item.id + " class='speciallink'>TestLink</a>" +
+        pruneMarker.data.popup = ("<a href=" + '@Url.Action("Edit", "Computers")?id=' + item.id + " class='speciallink'>" +
+          "<h4 class='text-center' style= 'color:#d26143'>" + item.name + "</h4></a>" +
           "<table class='table table-striped'>" +
           "<tr><th style='color:#397692'>Status</th><td>: " + item.status + "</td></tr>" +
           "<tr><th style='color:#397692'>Lat</th><td>: " + item.lat + " </td></tr>" +

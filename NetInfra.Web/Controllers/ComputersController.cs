@@ -97,6 +97,8 @@ namespace NetInfra.Controllers
           computerInDb.Stn = model.Computer.Stn;
           computerInDb.Serino = model.Computer.Serino;
           computerInDb.AgTipId = model.Computer.AgTipId;
+          computerInDb.Lat = model.Computer.Lat;
+          computerInDb.Lon = model.Computer.Lon;
         }
 
         await _context.SaveChangesAsync();
