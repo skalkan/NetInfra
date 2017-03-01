@@ -399,8 +399,8 @@
     ////PRUNE CLUSTER CUSTOMIZATION END
 
 
-    
-    
+
+
 
 
 
@@ -445,7 +445,7 @@
 
 
       // INFO CONTROL BEGIN
-      
+
       // control that shows state info on hover
       var info = L.control();
 
@@ -454,7 +454,7 @@
         this.update();
         return this._div;
       };
-      
+
       info.update = function (props) {
         this._div.innerHTML = '<h4>Ders Binaları</h4>' + (props ?
           '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
@@ -547,7 +547,9 @@
 
         var pruneMarker = new PruneCluster.Marker(myLat, myLon);
         pruneMarker.data.storeId = item.id;
+        myHref = '@Url.Action("Edit", "Computers")?id=' + item.id;
         pruneMarker.data.popup = ("<h4 class='text-center' style='color:#d26143'>" + item.name + "</h4>" +
+          "<a href=" + '@Url.Action("Edit", "Computers")?id=' + item.id + " class='speciallink'>TestLink</a>" +
           "<table class='table table-striped'>" +
           "<tr><th style='color:#397692'>Status</th><td>: " + item.status + "</td></tr>" +
           "<tr><th style='color:#397692'>Lat</th><td>: " + item.lat + " </td></tr>" +
