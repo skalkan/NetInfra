@@ -5,7 +5,7 @@
         "type": "Feature",
         "id": "01",
         "properties": {
-          "name": "C Binası",
+          "name": "QWE Binası",
           "density": 49.65
         },
         "geometry": {
@@ -39,7 +39,7 @@
       {
         "type": "Feature",
         "properties": {
-          "name": "D Binası",
+          "name": "ASD Binası",
           "density": 33.44
         },
         "geometry": {
@@ -74,7 +74,7 @@
       {
         "type": "Feature",
         "properties": {
-          "name": "H Binası",
+          "name": "ZXC Binası",
           "density": 77.12
         },
         "geometry": {
@@ -108,7 +108,7 @@
       {
         "type": "Feature",
         "properties": {
-          "name": "Y Binası",
+          "name": "RTY Binası",
           "density": 503.22
         },
         "geometry": {
@@ -142,7 +142,7 @@
       {
         "type": "Feature",
         "properties": {
-          "name": "M Binası",
+          "name": "FGH Binası",
           "density": 1503.22
         },
         "geometry": {
@@ -208,7 +208,7 @@
       //{
       //  "type": "Feature",
       //  "properties": {
-      //    "name": "E Binası",
+      //    "name": "VBN Binası",
       //    "density": 1503.22
       //  },
       //  "geometry": {
@@ -354,7 +354,7 @@
       //{
       //  "type": "Feature",
       //  "properties": {
-      //    "name": "A Binası",
+      //    "name": "PLM Binası",
       //    "density": 19.33
       //  },
       //  "geometry": {
@@ -500,7 +500,7 @@
       {
         "type": "Feature",
         "properties": {
-          "name": "M Binası",
+          "name": "UIO Binası",
           "density": 7.46
         },
         "geometry": {
