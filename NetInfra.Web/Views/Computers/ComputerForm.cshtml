@@ -23,11 +23,11 @@
   </div>
   <div class="form-group">
     <label asp-for="Computer.Lat" class="col-md-2 control-label"></label>
-    <input asp-for="Computer.Lat" class="form-control" />
+    <input asp-for="Computer.Lat" asp-format="{0:N6}" class="form-control" />
   </div>
   <div class="form-group">
     <label asp-for="Computer.Lon" class="col-md-2 control-label"></label>
-    <input asp-for="Computer.Lon" class="form-control" />
+    <input asp-for="Computer.Lon" asp-format="{0:N6}" class="form-control" />
   </div>
   @Html.HiddenFor(m => m.Computer.Id)
   @*<input asp-for="Computer.Id" type="hidden" name="computerId" value="@Model.Computer.Id" />*@

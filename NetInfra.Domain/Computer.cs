@@ -21,9 +21,11 @@ namespace NetInfra.Domain
     public int? AgTipId { get; set; }
 
     [Display(Name = "Latitude")]
+    [DisplayFormat(DataFormatString = "{0:N6}, ApplyFormatInEditMode = true")]
     public decimal? Lat { get; set; }
 
     [Display(Name = "Longitude")]
+    [DisplayFormat(DataFormatString = "{0:N6}, ApplyFormatInEditMode = true")]
     public decimal? Lon { get; set; }
   }
 }

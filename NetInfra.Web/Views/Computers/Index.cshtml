@@ -22,6 +22,8 @@ else
         <th>STN</th>
         <th>Seri No</th>
         <th>Ağ Tipi</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
       </tr>
     </thead>
     <tbody>
@@ -31,6 +33,8 @@ else
           <td><a asp-controller="Computers" asp-action="Edit" asp-route-id="@computer.Id">@computer.Stn</a></td>
           <td>@computer.Serino</td>
           <td>@computer.AgTip.Ad</td>
+          <td>@computer.Lat</td>
+          <td>@computer.Lon</td>
         </tr>
       }
     </tbody>

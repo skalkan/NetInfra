@@ -26,7 +26,7 @@
   <input id="btnCancel" type="submit" value="Cancel" class="btn btn-white btn-block" />
 </div>
 
-<div id="mapid" style="width: 100%; height: 700px">
+<div id="mapid" style="width: 100%; height: 650px">
 </div>
 
 @section Scripts {
@@ -439,7 +439,7 @@
       // Font-Awesome markers
       L.marker([51.941196, 4.512291], { icon: L.AwesomeMarkers.icon({ icon: 'spinner', markerColor: 'red', prefix: 'fa', spin: true }) }).addTo(map);
       L.marker([51.927913, 4.521303], { icon: L.AwesomeMarkers.icon({ icon: 'coffee', markerColor: 'orange', prefix: 'fa', iconColor: 'black' }) }).addTo(map);
-      L.marker([51.936063, 4.502077], { icon: L.AwesomeMarkers.icon({ icon: 'cog', prefix: 'fa', markerColor: 'purple', iconColor: '#6b1d5c' }) }).addTo(map);
+      L.marker([51.936063, 4.502077], { icon: L.AwesomeMarkers.icon({ icon: 'cog', prefix: 'fa', markerColor: 'purple', iconColor: '#6b1d5c' }), draggable: true }).addTo(map);
 
       // Glyphicons
       L.marker([51.932835, 4.506969], { icon: L.AwesomeMarkers.icon({ icon: 'star', prefix: 'glyphicon', markerColor: 'green' }) }).addTo(map);
@@ -535,6 +535,30 @@
 
       // L.geoJSON(binalarData).addTo(map);
 
+
+      // Script for adding marker on map click
+      function onMapClick(e) {
+
+        var marker = L.marker(e.latlng, {
+          draggable: true,
+          title: "Computer location",
+          alt: "Computer Location",
+          riseOnHover: true
+        }).addTo(map)
+          .bindPopup(e.latlng.toString()).openPopup();
+
+        // Update marker on changing it's position
+        marker.on("dragend", function (ev) {
+
+          var changedPos = ev.target.getLatLng();
+          this.bindPopup(changedPos.toString()).openPopup();
+
+        });
+      }
+
+      map.on('click', onMapClick);
+
+
     }//end function initMap() {
 
     function refreshMarkers(data) {
@@ -549,7 +573,7 @@
         //console.log("store LAT: " + item.Lat.toString() + " LON: " + item.Lon.toString());
 
         var pruneMarker = new PruneCluster.Marker(myLat, myLon);
-
+        pruneMarker.draggable = true;
         pruneMarker.data.storeId = item.id;
 
         myHref = '@Url.Action("Edit", "Computers")?id=' + item.id;
